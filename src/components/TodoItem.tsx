@@ -58,7 +58,7 @@ export default function TodoItem({
   }
 
   return (
-    <li className="flex items-center gap-3" style={{ opacity: isPending ? 0.5 : 1 }}>
+    <div className="flex items-center gap-3" style={{ opacity: isPending ? 0.5 : 1 }}>
       <input type="checkbox" checked={todo.completed} onChange={handleToggle} disabled={isPending} />
       {editing ? (
         <input
@@ -88,6 +88,6 @@ export default function TodoItem({
           </button>
         </div>
       )}
-    </li>
+    </div>
   )
 }
