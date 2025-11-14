@@ -1,0 +1,8 @@
+-- 自动初始化（若表不存在）
+CREATE TABLE IF NOT EXISTS "Todo" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "text" TEXT NOT NULL,
+    "completed" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "order" INTEGER NOT NULL DEFAULT 0
+);

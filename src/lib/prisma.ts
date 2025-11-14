@@ -1,13 +1,25 @@
 import { PrismaClient } from '@prisma/client'
+import { Pool } from 'pg'
+import { PrismaPg } from '@prisma/adapter-pg'
 
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
+const connectionString = process.env.DATABASE_URL
+if (!connectionString) {
+  throw new Error('DATABASE_URL is not defined')
+}
 
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    log: ['error', 'warn']
-  })
+const pool = new Pool({ connectionString })
+const adapter = new PrismaPg(pool)
 
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma
+export const prisma = new PrismaClient({ adapter })
+
+// 首次使用时自动建表（免 migrate deploy）
+export async function ensureTable() {
+  await prisma.$executeRaw`
+    CREATE TABLE IF NOT EXISTS "Todo" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "text" TEXT NOT NULL,
+      "completed" BOOLEAN NOT NULL DEFAULT false,
+      "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "order" INTEGER NOT NULL DEFAULT 0
+    );`
 }
