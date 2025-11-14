@@ -2,12 +2,16 @@
 
 import type { Todo } from '@prisma/client'
 import TodoItem from '@/components/TodoItem'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { reorderTodosAction } from '@/app/actions'
 
 export default function TodoList({ todos }: { todos: Todo[] }) {
   const [items, setItems] = useState(todos)
   const [draggingId, setDraggingId] = useState<string | null>(null)
+
+  useEffect(() => {
+    setItems(todos)
+  }, [todos])
 
   if (!items.length) {
     return <p className="text-zinc-600">暂无待办事项</p>
@@ -45,6 +49,14 @@ export default function TodoList({ todos }: { todos: Todo[] }) {
 
   const handleDragEnd = () => setDraggingId(null)
 
+  const handleToggleLocal = (id: string, nextCompleted: boolean) => {
+    setItems((prev) => prev.map((t) => (t.id === id ? { ...t, completed: nextCompleted } : t)))
+  }
+
+  const handleDeleteLocal = (id: string) => {
+    setItems((prev) => prev.filter((t) => t.id !== id))
+  }
+
   return (
     <ul className="flex flex-col gap-2">
       {items.map((todo) => (
@@ -60,7 +72,7 @@ export default function TodoList({ todos }: { todos: Todo[] }) {
             (draggingId === todo.id ? ' opacity-60 bg-sky-100' : '')
           }
         >
-          <TodoItem todo={todo} />
+          <TodoItem todo={todo} onToggle={handleToggleLocal} onDelete={handleDeleteLocal} />
         </li>
       ))}
     </ul>

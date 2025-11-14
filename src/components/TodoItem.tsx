@@ -4,19 +4,29 @@ import { toggleTodoAction, deleteTodoAction } from '@/app/actions'
 import { useTransition } from 'react'
 import type { Todo } from '@prisma/client'
 
-export default function TodoItem({ todo }: { todo: Todo }) {
+export default function TodoItem({
+  todo,
+  onToggle,
+  onDelete
+}: {
+  todo: Todo
+  onToggle?: (id: string, nextCompleted: boolean) => void
+  onDelete?: (id: string) => void
+}) {
   const [isPending, startTransition] = useTransition()
 
   const handleToggle = () => {
     startTransition(() => {
       toggleTodoAction(todo.id, !todo.completed)
     })
+    onToggle?.(todo.id, !todo.completed)
   }
 
   const handleDelete = () => {
     startTransition(() => {
       deleteTodoAction(todo.id)
     })
+    onDelete?.(todo.id)
   }
 
   return (
