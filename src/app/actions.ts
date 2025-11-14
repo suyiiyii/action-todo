@@ -7,8 +7,11 @@ export async function createTodoAction(formData: FormData) {
   const text = formData.get('text')?.toString().trim()
   if (!text) return
 
+  const maxOrder = await prisma.todo.aggregate({ _max: { order: true } })
+  const nextOrder = (maxOrder._max.order ?? -1) + 1
+
   await prisma.todo.create({
-    data: { text }
+    data: { text, order: nextOrder }
   })
 
   revalidatePath('/')
@@ -28,5 +31,15 @@ export async function deleteTodoAction(id: string) {
     where: { id }
   })
 
+  revalidatePath('/')
+}
+
+export async function reorderTodosAction(orderedIds: string[]) {
+  if (!orderedIds?.length) return
+  await prisma.$transaction(
+    orderedIds.map((id, index) =>
+      prisma.todo.update({ where: { id }, data: { order: index } })
+    )
+  )
   revalidatePath('/')
 }

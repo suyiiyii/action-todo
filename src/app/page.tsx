@@ -4,7 +4,7 @@ import TodoList from '@/components/TodoList'
 
 export default async function Home() {
   const todos = await prisma.todo.findMany({
-    orderBy: { createdAt: 'desc' }
+    orderBy: [{ order: 'asc' }, { createdAt: 'desc' }]
   })
 
   return (

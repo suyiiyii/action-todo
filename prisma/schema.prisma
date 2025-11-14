@@ -12,4 +12,5 @@ model Todo {
   text      String
   completed Boolean  @default(false)
   createdAt DateTime @default(now())
+  order     Int      @default(0)
 }
