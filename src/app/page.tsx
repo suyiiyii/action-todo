@@ -8,9 +8,9 @@ export default async function Home() {
   })
 
   return (
-    <div className="flex min-h-screen items-start justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex w-full max-w-3xl flex-col gap-6 py-16 px-6 bg-white dark:bg-black">
-        <h1 className="text-3xl font-semibold text-black dark:text-zinc-50">My Todos</h1>
+    <div className="flex min-h-screen items-start justify-center bg-sky-100 font-sans">
+      <main className="flex w-full max-w-3xl flex-col gap-6 py-16 px-6 bg-white rounded-xl shadow-md border border-sky-200">
+        <h1 className="text-3xl font-semibold text-sky-900">My Todos</h1>
         <AddTodoForm />
         <TodoList todos={todos} />
       </main>

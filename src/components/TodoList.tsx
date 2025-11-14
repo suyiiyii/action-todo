@@ -56,8 +56,8 @@ export default function TodoList({ todos }: { todos: Todo[] }) {
           onDrop={handleDrop(todo.id)}
           onDragEnd={handleDragEnd}
           className={
-            'rounded border border-transparent hover:border-zinc-200 p-2 cursor-move bg-white dark:bg-black' +
-            (draggingId === todo.id ? ' opacity-50' : '')
+            'rounded border border-sky-200 hover:border-sky-400 p-2 cursor-move bg-white shadow-sm' +
+            (draggingId === todo.id ? ' opacity-60 bg-sky-100' : '')
           }
         >
           <TodoItem todo={todo} />

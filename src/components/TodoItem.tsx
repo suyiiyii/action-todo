@@ -22,8 +22,8 @@ export default function TodoItem({ todo }: { todo: Todo }) {
   return (
     <li className="flex items-center gap-3" style={{ opacity: isPending ? 0.5 : 1 }}>
       <input type="checkbox" checked={todo.completed} onChange={handleToggle} disabled={isPending} />
-      <span className={todo.completed ? 'line-through text-zinc-500' : ''}>{todo.text}</span>
-      <button onClick={handleDelete} disabled={isPending} className="ml-auto text-red-600">
+      <span className={todo.completed ? 'line-through text-slate-400' : 'text-slate-700'}>{todo.text}</span>
+      <button onClick={handleDelete} disabled={isPending} className="ml-auto text-rose-500 hover:text-rose-400">
         删除
       </button>
     </li>
