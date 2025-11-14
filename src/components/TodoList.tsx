@@ -57,6 +57,10 @@ export default function TodoList({ todos }: { todos: Todo[] }) {
     setItems((prev) => prev.filter((t) => t.id !== id))
   }
 
+  const handleEditLocal = (id: string, nextText: string) => {
+    setItems((prev) => prev.map((t) => (t.id === id ? { ...t, text: nextText } : t)))
+  }
+
   return (
     <ul className="flex flex-col gap-2">
       {items.map((todo) => (
@@ -72,7 +76,12 @@ export default function TodoList({ todos }: { todos: Todo[] }) {
             (draggingId === todo.id ? ' opacity-60 bg-sky-100' : '')
           }
         >
-          <TodoItem todo={todo} onToggle={handleToggleLocal} onDelete={handleDeleteLocal} />
+          <TodoItem
+            todo={todo}
+            onToggle={handleToggleLocal}
+            onDelete={handleDeleteLocal}
+            onEdit={handleEditLocal}
+          />
         </li>
       ))}
     </ul>

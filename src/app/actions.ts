@@ -43,3 +43,13 @@ export async function reorderTodosAction(orderedIds: string[]) {
   )
   revalidatePath('/')
 }
+
+export async function updateTodoTextAction(id: string, text: string) {
+  const next = text?.trim()
+  if (!next) return
+  await prisma.todo.update({
+    where: { id },
+    data: { text: next }
+  })
+  revalidatePath('/')
+}
