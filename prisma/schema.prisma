@@ -14,4 +14,5 @@ model Todo {
   completed Boolean  @default(false)
   createdAt DateTime @default(now())
   order     Int      @default(0)
+  detailMarkdown String?
 }

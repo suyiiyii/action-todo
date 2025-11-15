@@ -4,13 +4,10 @@ import TodoList from '@/components/TodoList'
 
 export const dynamic = 'force-dynamic' // 强制动态渲染，不尝试静态生成
 
-import { ensureTable } from '@/lib/prisma'
-
 export default async function Home() {
   let todos: Awaited<ReturnType<typeof prisma.todo.findMany>> = []
   let loadError = false
   try {
-    await ensureTable()
     todos = await prisma.todo.findMany({
       orderBy: [{ order: 'asc' }, { createdAt: 'desc' }]
     })
