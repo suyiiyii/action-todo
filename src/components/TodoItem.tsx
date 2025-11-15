@@ -83,6 +83,9 @@ export default function TodoItem({
           <button onClick={handleStartEdit} className="text-sky-600 hover:text-sky-500">
             编辑
           </button>
+          <a href={`/todo/${todo.id}`} className="text-slate-600 hover:text-slate-500">
+            详情
+          </a>
           <button onClick={handleDelete} disabled={isPending} className="text-rose-500 hover:text-rose-400">
             删除
           </button>

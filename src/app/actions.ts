@@ -4,7 +4,15 @@ import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 
 export async function createTodoAction(formData: FormData) {
-  const text = formData.get('text')?.toString().trim()
+  let text = formData.get('text')?.toString().trim()
+  if (!text) {
+    for (const [key, value] of formData.entries()) {
+      if (key.endsWith('_text')) {
+        text = String(value).trim()
+        break
+      }
+    }
+  }
   if (!text) return
 
   const maxOrder = await prisma.todo.aggregate({ _max: { order: true } })
@@ -52,4 +60,21 @@ export async function updateTodoTextAction(id: string, text: string) {
     data: { text: next }
   })
   revalidatePath('/')
+}
+
+export async function updateTodoDetailAction(id: string, md: string) {
+  const next = md?.trim() ?? ''
+  await prisma.todo.update({
+    where: { id },
+    data: { detailMarkdown: next }
+  })
+  revalidatePath('/')
+  revalidatePath(`/todo/${id}`)
+}
+
+export async function updateTodoDetailFromFormAction(formData: FormData) {
+  const id = String(formData.get('id') ?? '')
+  const md = String(formData.get('detail') ?? '')
+  if (!id) return
+  await updateTodoDetailAction(id, md)
 }

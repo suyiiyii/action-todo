@@ -2,9 +2,12 @@ import { PrismaClient } from '@prisma/client'
 import { Pool } from 'pg'
 import { PrismaPg } from '@prisma/adapter-pg'
 
-const connectionString = process.env.DATABASE_URL
-if (!connectionString) {
-  throw new Error('DATABASE_URL is not defined')
+function getEnvConn(useDirect: boolean) {
+  const conn = useDirect ? process.env.DIRECT_URL : process.env.DATABASE_URL
+  if (!conn) {
+    throw new Error(useDirect ? 'DIRECT_URL is not defined' : 'DATABASE_URL is not defined')
+  }
+  return conn
 }
 
 function getSslConfig() {
@@ -14,36 +17,31 @@ function getSslConfig() {
   const caText = process.env.PG_SSL_CA
   const cert = process.env.PG_SSL_CERT
   const key = process.env.PG_SSL_KEY
-  
-  // For Supabase, we need to handle SSL properly
+
   const ca = caB64 ? Buffer.from(caB64, 'base64').toString('utf8') : caText
-  
-  // Default SSL configuration for Supabase
-  let ssl: any = { rejectUnauthorized: false } // Default to permissive for Supabase
-  
-  // Override with environment settings if provided
-  if (verifySwitch === 'true') {
-    ssl.rejectUnauthorized = true
-  } else if (verifySwitch === 'false') {
-    ssl.rejectUnauthorized = false
-  }
-  
-  // Add CA certificate if provided
-  if (ca) {
+
+  const host = (() => { try { return new URL(process.env.DIRECT_URL || process.env.DATABASE_URL || '').hostname } catch { return '' } })()
+  const isPooler = host.includes('pooler.supabase.com')
+  const verify = verifySwitch === 'true' ? true : verifySwitch === 'false' ? false : (isPooler ? false : isProd)
+  const ssl: any = { rejectUnauthorized: verify }
+
+  if (verify && ca) {
     ssl.ca = ca
-    ssl.rejectUnauthorized = true // Enable verification if CA is provided
   }
-  
+
   if (cert) ssl.cert = cert
   if (key) ssl.key = key
-  
-  console.log(`🔒 SSL Config: rejectUnauthorized=${ssl.rejectUnauthorized}, CA=${ca ? 'provided' : 'not provided'}`)
-  
+
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`🔒 SSL Config: rejectUnauthorized=${ssl.rejectUnauthorized}, CA=${ca ? 'provided' : 'not provided'}`)
+  }
+
   return ssl
 }
 
 const ssl = getSslConfig()
-const pool = new Pool({ connectionString, ssl })
+const useDirect = !!ssl?.rejectUnauthorized
+const pool = new Pool({ connectionString: getEnvConn(useDirect), ssl })
 const adapter = new PrismaPg(pool)
 
 export const prisma = new PrismaClient({ adapter })
@@ -98,7 +96,7 @@ export async function ensureTable() {
       const msg = String(e?.message || '')
       const host = (() => {
         try {
-          const u = new URL(connectionString || '')
+          const u = new URL(direct || '')
           return u.host
         } catch {
           return ''
