@@ -29,6 +29,9 @@ importers:
       remark-gfm:
         specifier: ^4.0.1
         version: 4.0.1
+      zod:
+        specifier: ^4.1.12
+        version: 4.1.12
     devDependencies:
       '@prisma/adapter-pg':
         specifier: ^6.19.0
